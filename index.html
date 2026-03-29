@@ -8,655 +8,479 @@
 <meta name="apple-mobile-web-app-title" content="My Routine">
 <title>My Daily Routine</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #ffffff;
-    --bg2: #f7f7f5;
-    --bg3: #f0efe9;
-    --text: #1a1a1a;
-    --text2: #666660;
-    --text3: #999992;
-    --border: rgba(0,0,0,0.1);
-    --border2: rgba(0,0,0,0.18);
-    --accent: #2c2c2a;
-    --info-bg: #e6f1fb;
-    --info-text: #0c447c;
-    --warn-bg: #faeeda;
-    --warn-text: #854f0b;
-    --success-bg: #eaf3de;
-    --success-text: #3b6d11;
-    --radius: 10px;
-    --radius-sm: 7px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1c1c1a;
-      --bg2: #252523;
-      --bg3: #2e2e2b;
-      --text: #f0efe9;
-      --text2: #a8a89e;
-      --text3: #6e6e66;
-      --border: rgba(255,255,255,0.1);
-      --border2: rgba(255,255,255,0.18);
-      --accent: #e8e7e0;
-      --info-bg: #0c2a45;
-      --info-text: #85b7eb;
-      --warn-bg: #3a2a0a;
-      --warn-text: #fac775;
-      --success-bg: #1a2e0a;
-      --success-text: #c0dd97;
-    }
-  }
-
-  html, body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-  }
-
-  .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
-
-  .header {
-    padding: 20px 16px 12px;
-    border-bottom: 0.5px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 10;
-  }
-
-  .header-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
-  .greeting { font-size: 20px; font-weight: 600; color: var(--text); }
-  .date-str { font-size: 13px; color: var(--text2); }
-
-  .tab-row {
-    display: flex;
-    gap: 6px;
-  }
-
-  .tab {
-    flex: 1;
-    padding: 8px 0;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    background: var(--bg);
-    color: var(--text2);
-    text-align: center;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .tab.active {
-    background: var(--accent);
-    color: var(--bg);
-    border-color: var(--accent);
-  }
-
-  .content { padding: 16px; }
-
-  .section { display: none; }
-  .section.active { display: block; }
-
-  .sub-tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 14px;
-  }
-
-  .sub-tab {
-    flex: 1;
-    padding: 7px 0;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    background: var(--bg2);
-    color: var(--text2);
-    text-align: center;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .sub-tab.active {
-    background: var(--bg3);
-    color: var(--text);
-    border-color: var(--border2);
-  }
-
-  .sub-section { display: none; }
-  .sub-section.active { display: block; }
-
-  .card {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-
-  .card-head {
-    padding: 12px 14px 10px;
-    border-bottom: 0.5px solid var(--border);
-  }
-
-  .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
-  .card-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-  .question {
-    padding: 12px 14px;
-    background: var(--bg2);
-    border-bottom: 0.5px solid var(--border);
-  }
-
-  .question-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-weight: 500; }
-
-  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
-
-  .choice {
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 0.5px solid var(--border2);
-    font-size: 13px;
-    cursor: pointer;
-    background: var(--bg);
-    color: var(--text);
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .choice.selected {
-    background: var(--accent);
-    color: var(--bg);
-    border-color: var(--accent);
-  }
-
-  .day-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-  }
-
-  .day-btn {
-    padding: 6px 2px;
-    border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border2);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    background: var(--bg);
-    color: var(--text);
-    text-align: center;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .day-btn.selected { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .day-btn.today { border-color: var(--border2); font-weight: 700; }
-
-  .steps { list-style: none; }
-
-  .step {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    padding: 11px 14px;
-    border-bottom: 0.5px solid var(--border);
-  }
-
-  .step:last-child { border-bottom: none; }
-
-  .step-num {
-    min-width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--bg2);
-    border: 0.5px solid var(--border2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text2);
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  .step-body { flex: 1; min-width: 0; }
-  .step-product { font-size: 14px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .step-note { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
-
-  .badge {
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
-  .b-active { background: var(--warn-bg); color: var(--warn-text); }
-  .b-skip { background: var(--bg3); color: var(--text3); }
-  .b-tip { background: var(--info-bg); color: var(--info-text); }
-  .b-boost { background: var(--success-bg); color: var(--success-text); }
-
-  .tip-box {
-    margin: 10px 14px 14px;
-    padding: 10px 12px;
-    background: var(--info-bg);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    color: var(--info-text);
-    line-height: 1.5;
-  }
-
-  .bha-banner {
-    margin: 0 0 12px;
-    padding: 10px 14px;
-    background: var(--warn-bg);
-    border-radius: var(--radius);
-    font-size: 13px;
-    color: var(--warn-text);
-    font-weight: 500;
-    display: none;
-  }
-
-  .sec-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 10px 14px 4px;
-    border-bottom: 0.5px solid var(--border);
-  }
-
-  .look-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .look-card {
-    padding: 12px;
-    border-radius: var(--radius);
-    border: 0.5px solid var(--border2);
-    cursor: pointer;
-    background: var(--bg);
-    text-align: center;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .look-card.selected {
-    border-color: var(--accent);
-    background: var(--bg2);
-  }
-
-  .look-name { font-size: 14px; font-weight: 600; color: var(--text); }
-  .look-vibe { font-size: 11px; color: var(--text2); margin-top: 2px; }
-
-  .makeup-steps { display: none; }
-  .makeup-steps.active { display: block; }
-
-  .divider { height: 0.5px; background: var(--border); margin: 4px 0; }
-
-  .empty-state {
-    text-align: center;
-    padding: 32px 16px;
-    color: var(--text3);
-    font-size: 14px;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0efe9;
+  --text:#1a1a1a;--text2:#666660;--text3:#999992;
+  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+  --accent:#2c2c2a;
+  --ibg:#e6f1fb;--itx:#0c447c;
+  --wbg:#faeeda;--wtx:#854f0b;
+  --sbg:#eaf3de;--stx:#3b6d11;
+  --dbg:#fcebeb;--dtx:#a32d2d;
+  --pbg:#fbeaf0;--ptx:#72243e;
+  --r:10px;--rs:7px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;
+  --text:#f0efe9;--text2:#a8a89e;--text3:#6e6e66;
+  --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.18);
+  --accent:#e8e7e0;
+  --ibg:#0c2a45;--itx:#85b7eb;
+  --wbg:#3a2a0a;--wtx:#fac775;
+  --sbg:#1a2e0a;--stx:#c0dd97;
+  --dbg:#2d0f0f;--dtx:#f09595;
+  --pbg:#2a0d18;--ptx:#f4c0d1;
+}}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;}
+.app{max-width:480px;margin:0 auto;padding:0 0 80px;}
+.hdr{padding:16px 16px 10px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10;}
+.hdr-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+.greet{font-size:19px;font-weight:600;}
+.dstr{font-size:12px;color:var(--text2);}
+.tabs{display:flex;gap:5px;}
+.tab{flex:1;padding:7px 0;border-radius:var(--rs);border:0.5px solid var(--border2);font-size:13px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text2);text-align:center;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.tab.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+.cnt{padding:14px;}
+.sec{display:none;}.sec.on{display:block;}
+.stabs{display:flex;gap:6px;margin-bottom:12px;}
+.stab{flex:1;padding:7px 0;border-radius:var(--rs);border:0.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:var(--bg2);color:var(--text2);text-align:center;-webkit-tap-highlight-color:transparent;}
+.stab.on{background:var(--bg3);color:var(--text);border-color:var(--border2);}
+.ssec{display:none;}.ssec.on{display:block;}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden;}
+.card-h{padding:11px 14px 9px;border-bottom:0.5px solid var(--border);}
+.card-t{font-size:14px;font-weight:600;}
+.card-s{font-size:12px;color:var(--text2);margin-top:2px;}
+.q{padding:11px 14px;background:var(--bg2);border-bottom:0.5px solid var(--border);}
+.ql{font-size:12px;color:var(--text2);margin-bottom:7px;font-weight:500;}
+.brow{display:flex;gap:5px;flex-wrap:wrap;}
+.ch{padding:5px 11px;border-radius:20px;border:0.5px solid var(--border2);font-size:13px;cursor:pointer;background:var(--bg);color:var(--text);transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+.ch.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+.dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.db{padding:6px 2px;border-radius:var(--rs);border:0.5px solid var(--border2);font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text);text-align:center;-webkit-tap-highlight-color:transparent;}
+.db.on{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+.db.td{font-weight:700;}
+.steps{list-style:none;}
+.step{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-bottom:0.5px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.snum{min-width:22px;height:22px;border-radius:50%;background:var(--bg2);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0;margin-top:1px;}
+.sbody{flex:1;min-width:0;}
+.sprod{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.snote{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4;}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:500;flex-shrink:0;}
+.ba{background:var(--wbg);color:var(--wtx);}
+.bk{background:var(--bg3);color:var(--text3);}
+.bt{background:var(--ibg);color:var(--itx);}
+.bb{background:var(--sbg);color:var(--stx);}
+.bm{background:var(--pbg);color:var(--ptx);}
+.tipbox{margin:8px 14px 12px;padding:9px 12px;background:var(--ibg);border-radius:var(--rs);font-size:13px;color:var(--itx);line-height:1.5;}
+.maskbanner{margin:0 0 10px;padding:10px 14px;border-radius:var(--r);font-size:13px;font-weight:500;background:var(--pbg);color:var(--ptx);display:none;}
+.bhabanner{margin:0 0 10px;padding:10px 14px;border-radius:var(--r);font-size:13px;font-weight:500;background:var(--wbg);color:var(--wtx);display:none;}
+.slabel{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;padding:9px 14px 4px;border-bottom:0.5px solid var(--border);}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.lcard{padding:11px;border-radius:var(--r);border:0.5px solid var(--border2);cursor:pointer;background:var(--bg);text-align:center;-webkit-tap-highlight-color:transparent;}
+.lcard.on{border-color:var(--accent);background:var(--bg2);}
+.ln{font-size:14px;font-weight:600;}
+.lv{font-size:11px;color:var(--text2);margin-top:2px;}
+.empty{text-align:center;padding:28px 16px;color:var(--text3);font-size:14px;}
+.wblock{border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden;}
+.whead{padding:10px 14px;background:var(--bg2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.wtitle{font-size:13px;font-weight:600;}
+.wmeta{font-size:12px;color:var(--text2);}
+.warr{font-size:11px;color:var(--text3);margin-left:8px;transition:transform 0.2s;display:inline-block;}
+.warr.op{transform:rotate(180deg);}
+.wbody{display:none;}.wbody.op{display:block;}
+.mday{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-top:0.5px solid var(--border);}
+.mdate{min-width:62px;font-size:12px;color:var(--text2);padding-top:3px;flex-shrink:0;}
+.mdate.td{color:var(--itx);font-weight:600;}
+.mdate.past{color:var(--text3);}
+.mcnt{flex:1;}
+.mpill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;margin-bottom:3px;}
+.mj{background:#e1f5ee;color:#085041;}
+.mb{background:#eaf3de;color:#27500a;}
+.mv{background:#faeeda;color:#633806;}
+.mc{background:#e6f1fb;color:#0c447c;}
+.mk{background:var(--pbg);color:var(--ptx);}
+@media(prefers-color-scheme:dark){
+  .mj{background:#085041;color:#9fe1cb;}
+  .mb{background:#173404;color:#c0dd97;}
+  .mv{background:#412402;color:#fac775;}
+  .mc{background:#042c53;color:#85b7eb;}
+}
+.mnote{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4;}
+.madj{font-size:12px;color:var(--wtx);background:var(--wbg);padding:6px 10px;border-radius:var(--rs);margin-top:5px;line-height:1.5;display:block;}
+.ptag{display:inline-block;padding:1px 7px;border-radius:20px;font-size:11px;font-weight:500;margin-left:6px;vertical-align:middle;}
+.pt1{background:var(--ibg);color:var(--itx);}
+.pt2{background:var(--dbg);color:var(--dtx);}
+.pt3{background:var(--pbg);color:var(--ptx);}
+.wnote{padding:8px 14px;font-size:12px;color:var(--text2);border-top:0.5px solid var(--border);line-height:1.5;}
+.cdrow{display:flex;gap:6px;margin-bottom:12px;}
+.cdcard{flex:1;background:var(--bg2);border-radius:var(--rs);padding:8px 6px;text-align:center;}
+.cdnum{font-size:20px;font-weight:600;color:var(--text);}
+.cdlbl{font-size:10px;color:var(--text2);margin-top:1px;}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <div class="header">
-    <div class="header-top">
-      <div class="greeting" id="greeting">Good morning</div>
-      <div class="date-str" id="date-str"></div>
-    </div>
-    <div class="tab-row">
-      <button class="tab active" onclick="showTab('skincare',this)">Skincare</button>
-      <button class="tab" onclick="showTab('makeup',this)">Makeup</button>
-    </div>
-  </div>
-
-  <div class="content">
-
-    <div id="skincare" class="section active">
-      <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSub('am',this)">Morning</button>
-        <button class="sub-tab" onclick="showSub('pm',this)">Evening</button>
-      </div>
-
-      <div id="am" class="sub-section active">
-        <div class="card">
-          <div class="card-head">
-            <div class="card-title">Morning routine</div>
-            <div class="card-sub">Takes about 5 minutes</div>
-          </div>
-          <div class="question">
-            <div class="question-label">How does your skin feel right now?</div>
-            <div class="btn-row">
-              <button class="choice selected" onclick="setSkin('normal',this)">Normal</button>
-              <button class="choice" onclick="setSkin('tight',this)">Tight or dry</button>
-              <button class="choice" onclick="setSkin('oily',this)">Already oily</button>
-            </div>
-          </div>
-          <ul class="steps" id="am-steps"></ul>
-        </div>
-      </div>
-
-      <div id="pm" class="sub-section">
-        <div id="bha-banner" class="bha-banner">BHA night — Paula's Choice 2% BHA is in your routine tonight</div>
-        <div class="card">
-          <div class="card-head">
-            <div class="card-title">Evening routine</div>
-            <div class="card-sub">Wind down and repair</div>
-          </div>
-          <div class="question">
-            <div class="question-label">Day of the week</div>
-            <div class="day-grid" id="day-grid"></div>
-          </div>
-          <div class="question" id="cheek-q" style="display:none">
-            <div class="question-label">Do your cheeks feel tight tonight?</div>
-            <div class="btn-row">
-              <button class="choice" onclick="setCheek('yes',this)">Yes, a bit</button>
-              <button class="choice" onclick="setCheek('no',this)">No, feel fine</button>
-            </div>
-          </div>
-          <ul class="steps" id="pm-steps"></ul>
-        </div>
-      </div>
-    </div>
-
-    <div id="makeup" class="section">
-      <div class="look-grid">
-        <div class="look-card" onclick="setLook('wfh',this)">
-          <div class="look-name">WFH</div>
-          <div class="look-vibe">Minimal, skin-first</div>
-        </div>
-        <div class="look-card" onclick="setLook('smart',this)">
-          <div class="look-name">Smart casual</div>
-          <div class="look-vibe">Polished, defined</div>
-        </div>
-        <div class="look-card" onclick="setLook('date',this)">
-          <div class="look-name">Date night</div>
-          <div class="look-vibe">Romantic, warm</div>
-        </div>
-        <div class="look-card" onclick="setLook('evening',this)">
-          <div class="look-name">Evening out</div>
-          <div class="look-vibe">Bold, dramatic</div>
-        </div>
-      </div>
-      <div id="makeup-content">
-        <div class="empty-state">Select a look above to see your step-by-step guide</div>
-      </div>
-    </div>
-
+<div class="hdr">
+  <div class="hdr-top"><div class="greet" id="greet"></div><div class="dstr" id="dstr"></div></div>
+  <div class="tabs">
+    <button class="tab on" onclick="sTab('sk',this)">Skincare</button>
+    <button class="tab" onclick="sTab('mk',this)">Makeup</button>
+    <button class="tab" onclick="sTab('ms',this)">Masks</button>
   </div>
 </div>
 
+<div class="cnt">
+
+<div id="sk" class="sec on">
+  <div class="stabs">
+    <button class="stab on" onclick="sSub('am',this)">Morning</button>
+    <button class="stab" onclick="sSub('pm',this)">Evening</button>
+  </div>
+  <div id="am" class="ssec on">
+    <div id="ban-am" class="maskbanner"></div>
+    <div class="card">
+      <div class="card-h"><div class="card-t">Morning routine</div><div class="card-s">About 5 minutes</div></div>
+      <div class="q">
+        <div class="ql">How does your skin feel?</div>
+        <div class="brow">
+          <button class="ch on" onclick="setSkin('n',this)">Normal</button>
+          <button class="ch" onclick="setSkin('t',this)">Tight or dry</button>
+          <button class="ch" onclick="setSkin('o',this)">Already oily</button>
+        </div>
+      </div>
+      <ul class="steps" id="am-steps"></ul>
+    </div>
+  </div>
+  <div id="pm" class="ssec">
+    <div id="ban-bha" class="bhabanner"></div>
+    <div id="ban-pm" class="maskbanner"></div>
+    <div class="card">
+      <div class="card-h"><div class="card-t">Evening routine</div><div class="card-s">Wind down and repair</div></div>
+      <div class="q">
+        <div class="ql">Day of the week</div>
+        <div class="dgrid" id="dgrid"></div>
+      </div>
+      <div class="q" id="cheekq" style="display:none">
+        <div class="ql">Do your cheeks feel tight tonight?</div>
+        <div class="brow">
+          <button class="ch" onclick="setCheek('y',this)">Yes, a bit</button>
+          <button class="ch" onclick="setCheek('n',this)">No, feel fine</button>
+        </div>
+      </div>
+      <ul class="steps" id="pm-steps"></ul>
+    </div>
+  </div>
+</div>
+
+<div id="mk" class="sec">
+  <div class="lgrid">
+    <div class="lcard" onclick="sLook('w',this)"><div class="ln">WFH</div><div class="lv">Minimal, skin-first</div></div>
+    <div class="lcard" onclick="sLook('s',this)"><div class="ln">Smart casual</div><div class="lv">Polished, defined</div></div>
+    <div class="lcard" onclick="sLook('d',this)"><div class="ln">Date night</div><div class="lv">Romantic, warm</div></div>
+    <div class="lcard" onclick="sLook('e',this)"><div class="ln">Evening out</div><div class="lv">Bold, dramatic</div></div>
+  </div>
+  <div id="mkc"><div class="empty">Select a look above</div></div>
+</div>
+
+<div id="ms" class="sec">
+  <div class="cdrow" id="cdrow"></div>
+  <div id="msched"></div>
+</div>
+
+</div>
+</div>
+
 <script>
-var amSkin = 'normal';
-var pmDay = null;
-var pmCheek = null;
-var BHA_DAYS = ['Mon','Wed','Fri'];
-var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var DS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var WEDDING=new Date('2025-05-30');
+var BHA=['Mon','Wed','Fri'];
+var skin='n',day=null,cheek=null;
 
-function init() {
-  var now = new Date();
-  var h = now.getHours();
-  var greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('greeting').textContent = greet;
-  var opts = {weekday:'long', day:'numeric', month:'long'};
-  document.getElementById('date-str').textContent = now.toLocaleDateString('en-GB', opts);
-  buildDayGrid(now);
-  var todayShort = DAYS[now.getDay()];
-  selectDayByName(todayShort);
-  renderAM();
-}
-
-function buildDayGrid(now) {
-  var todayShort = DAYS[now.getDay()];
-  var grid = document.getElementById('day-grid');
-  grid.innerHTML = '';
-  DAYS.forEach(function(d) {
-    var btn = document.createElement('button');
-    btn.className = 'day-btn' + (d === todayShort ? ' today' : '');
-    btn.textContent = d;
-    btn.onclick = function() { selectDayByName(d); };
-    btn.id = 'day-' + d;
-    grid.appendChild(btn);
-  });
-}
-
-function selectDayByName(d) {
-  document.querySelectorAll('.day-btn').forEach(function(b){ b.classList.remove('selected'); });
-  var btn = document.getElementById('day-' + d);
-  if (btn) btn.classList.add('selected');
-  pmDay = d;
-  pmCheek = null;
-  document.querySelectorAll('#cheek-q .choice').forEach(function(b){ b.classList.remove('selected'); });
-  document.getElementById('cheek-q').style.display = 'block';
-  var isBHA = BHA_DAYS.indexOf(d) > -1;
-  document.getElementById('bha-banner').style.display = isBHA ? 'block' : 'none';
-  renderPM();
-}
-
-function showTab(tab, btn) {
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
-  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-  btn.classList.add('active');
-  document.getElementById(tab).classList.add('active');
-}
-
-function showSub(sub, btn) {
-  document.querySelectorAll('.sub-tab').forEach(function(t){ t.classList.remove('active'); });
-  document.querySelectorAll('.sub-section').forEach(function(s){ s.classList.remove('active'); });
-  btn.classList.add('active');
-  document.getElementById(sub).classList.add('active');
-}
-
-function setSkin(val, btn) {
-  document.querySelectorAll('#am .question .choice').forEach(function(b){ b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  amSkin = val;
-  renderAM();
-}
-
-function setCheek(val, btn) {
-  document.querySelectorAll('#cheek-q .choice').forEach(function(b){ b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  pmCheek = val;
-  renderPM();
-}
-
-function s(num, product, note, badge) {
-  var bHtml = '';
-  if (badge) {
-    bHtml = '<span class="badge b-' + badge.c + '">' + badge.l + '</span>';
-  }
-  return '<li class="step"><div class="step-num">' + num + '</div><div class="step-body"><div class="step-product">' + product + bHtml + '</div>' + (note ? '<div class="step-note">' + note + '</div>' : '') + '</div></li>';
-}
-
-function renderAM() {
-  var tight = amSkin === 'tight';
-  var n = 1;
-  var html = '';
-  html += s(n++, 'Rinse with water', 'Skip cleanser — preserve morning skin barrier', null);
-  html += s(n++, 'BoJ Ginseng Essence Water', 'Pat gently into skin', null);
-  html += s(n++, 'TO Hyaluronic Acid 2% + B5', 'Apply while skin is still damp from step 2', {c:'tip',l:'damp skin'});
-  html += s(n++, 'COSRX 6 Peptide Collagen Toner', 'Pat in', null);
-  html += s(n++, 'TO Niacinamide 10% + Zinc 1%', 'Targets PIH and T-zone — key step', null);
-  if (tight) {
-    html += s(n++, 'Clinique Moisture Surge (extra layer)', 'Cheeks tight — add second moisturiser layer on cheeks only', {c:'boost',l:'extra moisture'});
-  }
-  html += s(n++, 'TO Natural Moisturizing Factors + Beta Glucan', 'Wait 30s after niacinamide', null);
-  html += s(n++, 'BoJ Relief Sun Aqua-fresh SPF50+', 'Last step before makeup — non-negotiable', null);
-  html += s(n++, 'ILIA Lip Wrap Reviving Balm', null, null);
-  document.getElementById('am-steps').innerHTML = html;
-}
-
-function renderPM() {
-  if (!pmDay) return;
-  var isBHA = BHA_DAYS.indexOf(pmDay) > -1;
-  var tight = pmCheek === 'yes';
-  var n = 1;
-  var html = '';
-  html += s(n++, 'Clarins Total Cleansing Oil', 'Massage in circular motions to dissolve SPF and makeup', null);
-  html += s(n++, 'BoJ Green Plum Refreshing Cleanser', 'Second cleanse — water-based', null);
-  html += s(n++, 'BoJ Ginseng Essence Water', 'Pat gently', null);
-  html += s(n++, 'TO Hyaluronic Acid 2% + B5', 'Apply while skin is still damp', {c:'tip',l:'damp skin'});
-  if (isBHA) {
-    html += s(n++, "Paula's Choice 2% BHA", 'Wait 5 mins before next step', {c:'active',l:'BHA night'});
-    html += s(n++, 'BoJ Revive Eye Serum (Ginseng + Retinal)', 'Pat around eye area only — do not rub', null);
-    if (tight) {
-      html += s(n++, 'Clinique Moisture Surge Overnight Mask', 'Tight cheeks — use instead of regular moisturiser', {c:'boost',l:'extra moisture'});
-    } else {
-      html += s(n++, 'TO Natural Moisturizing Factors + Beta Glucan', null, null);
-    }
-  } else {
-    html += s(n++, 'COSRX 6 Peptide Collagen Toner', 'Non-BHA night — peptides instead', {c:'skip',l:'no BHA'});
-    html += s(n++, 'BoJ Revive Eye Serum (Ginseng + Retinal)', 'Pat around eye area only — do not rub', null);
-    if (tight) {
-      html += s(n++, 'Clinique Moisture Surge Overnight Mask', 'Tight cheeks — use instead of regular moisturiser', {c:'boost',l:'extra moisture'});
-    } else {
-      html += s(n++, 'TO Natural Moisturizing Factors + Beta Glucan', null, null);
-    }
-  }
-  html += s(n++, 'ILIA Lip Wrap Reviving Balm', null, null);
-  document.getElementById('pm-steps').innerHTML = html;
-}
-
-var LOOKS = {
-  wfh: {
-    sections: [
-      { label: 'Base', steps: [
-        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Fingers or brush — sheer and skin-like'},
-        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Under eyes only — dot and tap with ring finger, never drag'},
-      ]},
-      { label: 'Eyes', steps: [
-        {p:'Grace (soft gold pearl) all over lid', n:'Finger application for most natural finish'},
-        {p:'Cocoon (warm nude matte) in crease', n:'Small brush, windshield-wiper motion to blend'},
-        {p:'ILIA Limitless Lash Mascara', n:'1 coat — wiggle from root to tip'},
-      ]},
-      { label: 'Cheeks', steps: [
-        {p:'ILIA Sunshift Bronzer (Ray)', n:'Temples, nose bridge, outer cheeks only — blend upward. Not contour'},
-      ]},
-      { label: 'Lips', steps: [
-        {p:'Amberlight + Enamel or Porcelain gloss on top', n:'Gloss cools down and sheers out Amberlight for a WFH nude'},
-      ]},
-    ],
-    tip: 'Skip liner and brows today — let your skin be the focus.'
-  },
-  smart: {
-    sections: [
-      { label: 'Base', steps: [
-        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Damp fingers or brush'},
-        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Under eyes + any PIH spots — tap, never drag'},
-        {p:'Brow Pencil + Brow Gel', n:'Fill sparse areas first, set with gel — keep shape natural'},
-      ]},
-      { label: 'Eyes', steps: [
-        {p:'Grace all over lid', n:'Flat brush or finger'},
-        {p:'Cocoon in crease', n:'Blend in circular motion'},
-        {p:'Lineup on outer corner + lower lashline', n:'Small angled brush — press into outer V'},
-        {p:'Dusk gel liner on upper lashline', n:'Close to lashes — thin line only'},
-        {p:'ILIA Limitless Lash Mascara', n:'2 coats — wiggle from root, pull through tip'},
-      ]},
-      { label: 'Cheeks', steps: [
-        {p:'Flutter blush', n:'Start at outer corner of eye level — sweep up toward temple, not central'},
-        {p:'Sunshift Bronzer (Ray)', n:'Light touch — temples and outer cheeks'},
-      ]},
-      { label: 'Lips', steps: [
-        {p:'Rosette lipstick', n:'Apply directly, blot once — your best everyday polished lip'},
-      ]},
-    ],
-    tip: 'Blush placement key: start further out than you think and sweep upward. Lifts rather than widens.'
-  },
-  date: {
-    sections: [
-      { label: 'Base', steps: [
-        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Fingers for a skin-like finish'},
-        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Under eyes and any spots'},
-        {p:'Brow Pencil + Brow Gel', n:'Take your time — defined brows frame the face'},
-      ]},
-      { label: 'Eyes', steps: [
-        {p:'Grace all over lid', n:'Build intensity with a flat brush'},
-        {p:'Cocoon in crease, blended high', n:'Blend well above crease for depth'},
-        {p:'Lineup in outer V + lower lashline', n:'Deepen and define'},
-        {p:'Unite (copper pearl) on centre lid', n:'Fingertip only — dimensional centre pop'},
-        {p:'Dusk liner on upper lashline', n:'Slightly thicker than smart casual'},
-        {p:'ILIA Limitless Lash Mascara', n:'2–3 coats — let each dry before the next'},
-      ]},
-      { label: 'Cheeks', steps: [
-        {p:'Flutter blush', n:'A touch more than usual — outer cheeks sweeping up'},
-        {p:'Sunshift Bronzer (Ray)', n:'Temples + light nose tip dusting'},
-      ]},
-      { label: 'Lips', steps: [
-        {p:'Lady Bird multi-stick', n:'Brick-red — apply and press lips together. Pat rather than drag for a softer finish'},
-      ]},
-    ],
-    tip: 'Lady Bird is rich — a light touch is enough. Pat for a romantic, softer finish.'
-  },
-  evening: {
-    sections: [
-      { label: 'Base', steps: [
-        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Brush for slightly more coverage'},
-        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Build a second layer under eyes once first sets'},
-        {p:'Brow Pencil + Brow Gel', n:'Fully defined — take your time for evening intensity'},
-      ]},
-      { label: 'Eyes', steps: [
-        {p:'Grace all over lid', n:'Pack on with finger for maximum shimmer'},
-        {p:'Cocoon in crease, blended high', n:'Dramatic transition'},
-        {p:'Lineup in outer V + lower lashline + inner lower corner', n:'Press then blend edges for a defined outer V'},
-        {p:'Hunter (deep brick red) outer corner only', n:'Small brush — outer corner top and bottom. Blend edges thoroughly'},
-        {p:'Unite (copper pearl) centre lid', n:'Intensify the shimmer — fingertip only'},
-        {p:'Dusk liner — winged at outer corner', n:'Small flick for drama'},
-        {p:'ILIA Limitless Lash Mascara', n:'3 coats — build volume, wiggle at root'},
-      ]},
-      { label: 'Cheeks', steps: [
-        {p:'Flutter blush', n:'Outer cheekbones sweeping toward temples'},
-        {p:'Sunshift Bronzer (Ray)', n:'Temples and hairline — more definition than usual'},
-      ]},
-      { label: 'Lips', steps: [
-        {p:'Marsala lipstick', n:'Deep wine-red — apply with lip brush for precision. Blot, reapply for longevity'},
-      ]},
-    ],
-    tip: 'Hunter in the outer corner is the key move. Use a tiny brush and build slowly — easier to add than remove.'
-  }
+var MASKS={
+  '2025-04-08':{p:'mj',l:'Dr. Jart+ Vital Hydra Solution',when:'PM',dur:'20–30 mins',
+    pmAdj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 20\u201330 mins \u2192 eye serum \u2192 skip moisturiser (mask replaces it) \u2192 lip balm. Skip BHA and peptide toner tonight.'},
+  '2025-04-10':{p:'mv',l:'Torriden Vita C \u2014 first use',when:'PM',dur:'15\u201320 mins',
+    pmAdj:'First use. After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Skip BHA and peptide toner. Watch for any reaction.'},
+  '2025-04-12':{p:'mc',l:'COSRX Snail Hydrogel \u2014 first use',when:'PM',dur:'2\u20133 hrs awake only',
+    pmAdj:'First use \u2014 do not sleep in it yet. After cleanse: essence \u2192 HA (damp) \u2192 peptide toner \u2192 eye serum \u2192 COSRX as last step (replaces moisturiser) \u2192 lip balm. Remove before sleeping.'},
+  '2025-04-15':{p:'mb',l:'Torriden Balanceful',when:'PM',dur:'15\u201320 mins',
+    pmAdj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Skip BHA and peptide toner.'},
+  '2025-04-17':{p:'mv',l:'Torriden Vita C',when:'PM',dur:'15\u201320 mins',
+    pmAdj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Skip BHA and peptide toner.'},
+  '2025-04-19':{p:'mk',l:'Kos\xe9 8-min \u2014 first use',when:'AM',dur:'8 mins exactly',
+    amAdj:'Rinse \u2192 Kos\xe9 mask 8 mins exactly \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+  '2025-04-22':{p:'mv',l:'Torriden Vita C (last)',when:'PM',dur:'15\u201320 mins',
+    pmAdj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Skip BHA and peptide toner.'},
+  '2025-04-24':{p:'mc',l:'COSRX Snail Hydrogel',when:'PM',dur:'Overnight (tested, safe to sleep in)',
+    pmAdj:'After cleanse: essence \u2192 HA (damp) \u2192 peptide toner \u2192 eye serum \u2192 COSRX as last step (replaces moisturiser) \u2192 lip balm. Sleep in it tonight.'},
+  '2025-04-27':{p:'mb',l:'Torriden Balanceful (last)',when:'PM',dur:'15\u201320 mins',
+    pmAdj:'Last Balanceful \u2014 calm skin before Portugal. After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Skip BHA and peptide toner.'},
+  '2025-05-03':{p:'mk',l:'Kos\xe9 8-min',when:'AM',dur:'8 mins',
+    amAdj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+  '2025-05-07':{p:'mk',l:'Kos\xe9 8-min',when:'AM',dur:'8 mins',
+    amAdj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+  '2025-05-08':{p:'mj',l:'Dr. Jart+ Vital Hydra Solution (last)',when:'PM',dur:'20\u201330 mins',
+    pmAdj:'Welcome home \u2014 rehydrate after travel. After cleanse: essence \u2192 HA (damp) \u2192 mask 20\u201330 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Skip BHA and peptide toner.'},
+  '2025-05-15':{p:'mk',l:'Kos\xe9 8-min',when:'AM',dur:'8 mins',
+    amAdj:'Last mask before the no-new-products freeze. Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+  '2025-05-24':{p:'mk',l:'Kos\xe9 8-min',when:'AM',dur:'8 mins',
+    amAdj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+  '2025-05-27':{p:'mc',l:'COSRX Snail Hydrogel (last)',when:'PM',dur:'Overnight \u2014 3 nights before the wedding',
+    pmAdj:'Final glow treatment. After cleanse: essence \u2192 HA (damp) \u2192 peptide toner \u2192 eye serum \u2192 COSRX as last step (replaces moisturiser) \u2192 lip balm. Sleep in it.'},
+  '2025-05-29':{p:'mk',l:'Kos\xe9 8-min',when:'AM',dur:'8 mins',
+    amAdj:'Night before the wedding. Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+  '2025-05-30':{p:'mk',l:'Kos\xe9 8-min',when:'AM',dur:'8 mins \u2014 wedding morning',
+    amAdj:'Wedding morning. Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove and pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm \u2192 makeup.'}
 };
 
-function setLook(look, card) {
-  document.querySelectorAll('.look-card').forEach(function(c){ c.classList.remove('selected'); });
-  card.classList.add('selected');
-  var data = LOOKS[look];
-  var html = '<div class="card">';
-  data.sections.forEach(function(sec) {
-    html += '<div class="sec-label">' + sec.label + '</div>';
-    html += '<ul class="steps">';
-    sec.steps.forEach(function(st, i) {
-      html += s(i+1, st.p, st.n, null);
-    });
-    html += '</ul>';
-  });
-  if (data.tip) {
-    html += '<div class="tip-box">' + data.tip + '</div>';
+function dKey(d){var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dd;}
+function todayKey(){return dKey(new Date());}
+function getMask(){return MASKS[todayKey()]||null;}
+
+function init(){
+  var now=new Date(),h=now.getHours();
+  document.getElementById('greet').textContent=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  document.getElementById('dstr').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  buildDays(now);selDay(DS[now.getDay()]);
+  buildCD();buildMS();renderAM();showMaskBanners();
+}
+
+function showMaskBanners(){
+  var m=getMask();if(!m) return;
+  if(m.when==='AM'&&m.amAdj){var b=document.getElementById('ban-am');b.textContent='Mask morning: '+m.l+' ('+m.dur+')';b.style.display='block';}
+  if(m.when==='PM'&&m.pmAdj){var b=document.getElementById('ban-pm');b.textContent='Mask tonight: '+m.l+' ('+m.dur+')';b.style.display='block';}
+}
+
+function buildCD(){
+  var diff=WEDDING-new Date(),days=Math.max(0,Math.floor(diff/86400000)),wks=Math.floor(days/7),rem=days%7;
+  document.getElementById('cdrow').innerHTML=
+    cdc(days,'days to go')+cdc(wks,'weeks')+cdc(rem,'extra days')+cdc('May 30','wedding');
+}
+function cdc(n,l){return '<div class="cdcard"><div class="cdnum">'+n+'</div><div class="cdlbl">'+l+'</div></div>';}
+
+function buildDays(now){
+  var td=DS[now.getDay()],g=document.getElementById('dgrid');g.innerHTML='';
+  DS.forEach(function(d){var b=document.createElement('button');b.className='db'+(d===td?' td':'');b.id='db-'+d;b.textContent=d;b.onclick=function(){selDay(d);};g.appendChild(b);});
+}
+
+function selDay(d){
+  document.querySelectorAll('.db').forEach(function(b){b.classList.remove('on');});
+  var el=document.getElementById('db-'+d);if(el)el.classList.add('on');
+  day=d;cheek=null;
+  document.querySelectorAll('#cheekq .ch').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('cheekq').style.display='block';
+  var isBHA=BHA.indexOf(d)>-1;
+  var bb=document.getElementById('ban-bha');
+  bb.textContent="BHA night \u2014 Paula's Choice 2% BHA is in your routine tonight";
+  bb.style.display=isBHA?'block':'none';
+  renderPM();
+}
+
+function sTab(id,btn){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  btn.classList.add('on');document.getElementById(id).classList.add('on');
+}
+
+function sSub(id,btn){
+  document.querySelectorAll('.stab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.ssec').forEach(function(s){s.classList.remove('on');});
+  btn.classList.add('on');document.getElementById(id).classList.add('on');
+}
+
+function setSkin(v,btn){document.querySelectorAll('#am .q .ch').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');skin=v;renderAM();}
+function setCheek(v,btn){document.querySelectorAll('#cheekq .ch').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');cheek=v;renderPM();}
+
+function st(n,p,nt,bdg){
+  var bh=bdg?'<span class="badge b'+bdg.c+'">'+bdg.l+'</span>':'';
+  return '<li class="step"><div class="snum">'+n+'</div><div class="sbody"><div class="sprod">'+p+bh+'</div>'+(nt?'<div class="snote">'+nt+'</div>':'')+'</div></li>';
+}
+
+function renderAM(){
+  var m=getMask(),isMaskAM=m&&m.when==='AM',tight=skin==='t',n=1,h='';
+  if(isMaskAM){
+    h+=st(n++,'Rinse with water',null,null);
+    h+=st(n++,m.l,'Apply for '+m.dur+'. Remove and pat residue gently into skin.',{c:'m',l:'mask morning'});
+    h+=st(n++,'TO Hyaluronic Acid 2% + B5','Apply while skin is damp from mask residue',{c:'t',l:'damp skin'});
+    h+=st(n++,'COSRX 6 Peptide Collagen Toner','Pat in',null);
+    h+=st(n++,'TO Niacinamide 10% + Zinc 1%','Key for PIH and T-zone',null);
+    if(tight)h+=st(n++,'Clinique Moisture Surge (extra layer)','Cheeks tight \u2014 apply on cheeks only',{c:'b',l:'extra moisture'});
+    h+=st(n++,'TO Natural Moisturizing Factors + Beta Glucan',null,null);
+    h+=st(n++,'BoJ Relief Sun Aqua-fresh SPF50+','Last step before makeup',null);
+    h+=st(n++,'ILIA Lip Wrap Reviving Balm',null,null);
+  } else {
+    h+=st(n++,'Rinse with water','Skip cleanser \u2014 preserve morning skin barrier',null);
+    h+=st(n++,'BoJ Ginseng Essence Water','Pat gently',null);
+    h+=st(n++,'TO Hyaluronic Acid 2% + B5','Apply while skin is still damp',{c:'t',l:'damp skin'});
+    h+=st(n++,'COSRX 6 Peptide Collagen Toner','Pat in',null);
+    h+=st(n++,'TO Niacinamide 10% + Zinc 1%','Key for PIH and T-zone',null);
+    if(tight)h+=st(n++,'Clinique Moisture Surge (extra layer)','Cheeks tight \u2014 apply on cheeks only',{c:'b',l:'extra moisture'});
+    h+=st(n++,'TO Natural Moisturizing Factors + Beta Glucan',null,null);
+    h+=st(n++,'BoJ Relief Sun Aqua-fresh SPF50+','Last step before makeup',null);
+    h+=st(n++,'ILIA Lip Wrap Reviving Balm',null,null);
   }
-  html += '</div>';
-  document.getElementById('makeup-content').innerHTML = html;
+  document.getElementById('am-steps').innerHTML=h;
+}
+
+function renderPM(){
+  if(!day) return;
+  var m=getMask(),isMaskPM=m&&m.when==='PM',isBHA=BHA.indexOf(day)>-1,tight=cheek==='y',n=1,h='';
+  var isCosrx=m&&m.p==='mc';
+  if(isMaskPM){
+    h+=st(n++,'Clarins Total Cleansing Oil','Removes makeup and SPF',null);
+    h+=st(n++,'BoJ Green Plum Refreshing Cleanser','Second cleanse',null);
+    h+=st(n++,'BoJ Ginseng Essence Water','Pat gently',null);
+    h+=st(n++,'TO Hyaluronic Acid 2% + B5','Apply while damp',{c:'t',l:'damp skin'});
+    if(isCosrx){
+      h+=st(n++,'COSRX 6 Peptide Collagen Toner','Pat in',null);
+      h+=st(n++,'BoJ Revive Eye Serum (Ginseng + Retinal)','Pat around eye area only',null);
+      h+=st(n++,m.l,m.dur+' \u2014 apply as last step, replaces moisturiser.',{c:'m',l:'mask night'});
+    } else {
+      h+=st(n++,m.l,m.dur+' \u2014 replaces moisturiser. Skip peptide toner tonight.',{c:'m',l:'mask night'});
+      h+=st(n++,'BoJ Revive Eye Serum (Ginseng + Retinal)','Pat around eye area only',null);
+    }
+    h+=st(n++,'ILIA Lip Wrap Reviving Balm',null,null);
+  } else if(isBHA){
+    h+=st(n++,'Clarins Total Cleansing Oil','First cleanse',null);
+    h+=st(n++,'BoJ Green Plum Refreshing Cleanser','Second cleanse',null);
+    h+=st(n++,'BoJ Ginseng Essence Water',null,null);
+    h+=st(n++,'TO Hyaluronic Acid 2% + B5','Apply while damp',{c:'t',l:'damp skin'});
+    h+=st(n++,"Paula's Choice 2% BHA",'Wait 5 mins before next step',{c:'a',l:'BHA night'});
+    h+=st(n++,'BoJ Revive Eye Serum (Ginseng + Retinal)','Pat around eye area only',null);
+    if(tight)h+=st(n++,'Clinique Moisture Surge Overnight Mask','Tight cheeks \u2014 use instead of regular moisturiser',{c:'b',l:'extra moisture'});
+    else h+=st(n++,'TO Natural Moisturizing Factors + Beta Glucan',null,null);
+    h+=st(n++,'ILIA Lip Wrap Reviving Balm',null,null);
+  } else {
+    h+=st(n++,'Clarins Total Cleansing Oil','First cleanse',null);
+    h+=st(n++,'BoJ Green Plum Refreshing Cleanser','Second cleanse',null);
+    h+=st(n++,'BoJ Ginseng Essence Water',null,null);
+    h+=st(n++,'TO Hyaluronic Acid 2% + B5','Apply while damp',{c:'t',l:'damp skin'});
+    h+=st(n++,'COSRX 6 Peptide Collagen Toner','Non-BHA night',{c:'k',l:'no BHA'});
+    h+=st(n++,'BoJ Revive Eye Serum (Ginseng + Retinal)','Pat around eye area only',null);
+    if(tight)h+=st(n++,'Clinique Moisture Surge Overnight Mask','Tight cheeks \u2014 use instead of regular moisturiser',{c:'b',l:'extra moisture'});
+    else h+=st(n++,'TO Natural Moisturizing Factors + Beta Glucan',null,null);
+    h+=st(n++,'ILIA Lip Wrap Reviving Balm',null,null);
+  }
+  document.getElementById('pm-steps').innerHTML=h;
+}
+
+var WKS=[
+  {id:'w1',t:'Week 1 \u2014 rest',d:'Mar 29\u2013Apr 4',note:'No masks this week. Let your skin settle and establish the BHA routine first.',days:[]},
+  {id:'w2',t:'Week 2',d:'Apr 5\u201311',days:[
+    {dt:new Date('2025-04-08'),p:'mj',l:'Dr. Jart+ Vital Hydra Solution',ti:'PM \u2014 20\u201330 mins. Familiar mask, gentle intro.',adj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 20\u201330 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm.'},
+    {dt:new Date('2025-04-10'),p:'mv',l:'Torriden Vita C \u2014 first use',ti:'PM \u2014 15\u201320 mins. Thu for weekend buffer if any reaction.',adj:'First use. After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm. Watch for redness.'}
+  ]},
+  {id:'w3',t:'Week 3',d:'Apr 12\u201318',days:[
+    {dt:new Date('2025-04-12'),p:'mc',l:'COSRX Snail Hydrogel \u2014 first use',ti:'PM \u2014 2\u20133 hrs awake only. Sat = low stakes for first try.',adj:'First use \u2014 do not sleep in it yet. After cleanse: essence \u2192 HA (damp) \u2192 peptide toner \u2192 eye serum \u2192 COSRX as last step \u2192 lip balm. Remove before sleeping.'},
+    {dt:new Date('2025-04-15'),p:'mb',l:'Torriden Balanceful',ti:'PM \u2014 15\u201320 mins. Calms skin after Vita C.',adj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm.'},
+    {dt:new Date('2025-04-17'),p:'mv',l:'Torriden Vita C',ti:'PM \u2014 15\u201320 mins',adj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm.'}
+  ]},
+  {id:'w4',t:'Week 4',d:'Apr 19\u201325',days:[
+    {dt:new Date('2025-04-19'),p:'mk',l:'Kos\xe9 8-min \u2014 first use',ti:'AM \u2014 8 mins exactly. Sat morning, low stakes.',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+    {dt:new Date('2025-04-22'),p:'mv',l:'Torriden Vita C (last)',ti:'PM \u2014 15\u201320 mins',adj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm.'},
+    {dt:new Date('2025-04-24'),p:'mc',l:'COSRX Snail Hydrogel',ti:'PM \u2014 overnight (tested now, safe to sleep in)',adj:'After cleanse: essence \u2192 HA (damp) \u2192 peptide toner \u2192 eye serum \u2192 COSRX as last step \u2192 lip balm. Sleep in it tonight.'}
+  ]},
+  {id:'w5',t:'Week 5 \u2014 pre-Portugal',d:'Apr 25\u201328',note:'Pack Kos\xe9 only for Portugal (3 sheets). Leave COSRX at home.',days:[
+    {dt:new Date('2025-04-27'),p:'mb',l:'Torriden Balanceful (last)',ti:'PM \u2014 15\u201320 mins. Calm skin before travel.',adj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 15\u201320 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm.'}
+  ]},
+  {id:'w6',t:'Portugal',d:'Apr 29 \u2013 May 7',ph:'1',note:'Kos\xe9 only while travelling \u2014 portable and 8 mins. Leave COSRX at home (needs 2\u20133 hrs undisturbed).',days:[
+    {dt:new Date('2025-05-03'),p:'mk',l:'Kos\xe9 8-min',ti:'AM \u2014 mid-trip refresh',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+    {dt:new Date('2025-05-07'),p:'mk',l:'Kos\xe9 8-min',ti:'AM \u2014 morning you fly home',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'}
+  ]},
+  {id:'w7',t:'Week 7 \u2014 post-travel',d:'May 8\u201314',days:[
+    {dt:new Date('2025-05-08'),p:'mj',l:'Dr. Jart+ Vital Hydra Solution (last)',ti:'PM \u2014 rehydrate after travel',adj:'After cleanse: essence \u2192 HA (damp) \u2192 mask 20\u201330 mins \u2192 eye serum \u2192 skip moisturiser \u2192 lip balm.'}
+  ]},
+  {id:'w8',t:'Week 8 \u2014 final intensive',d:'May 15\u201321',ph:'2',note:'No new products from May 16. No BHA this week \u2014 keep skin calm and consistent.',days:[
+    {dt:new Date('2025-05-15'),p:'mk',l:'Kos\xe9 8-min',ti:'AM \u2014 last mask before the freeze',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'}
+  ]},
+  {id:'w9',t:'Wedding week',d:'May 22\u201330',ph:'3',note:'No BHA, no actives, no new products all week. Gentle routine only.',days:[
+    {dt:new Date('2025-05-24'),p:'mk',l:'Kos\xe9 8-min',ti:'AM \u2014 gentle mid-week boost',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+    {dt:new Date('2025-05-27'),p:'mc',l:'COSRX Snail Hydrogel (last)',ti:'PM overnight \u2014 3 nights before the wedding. Final glow treatment.',adj:'After cleanse: essence \u2192 HA (damp) \u2192 peptide toner \u2192 eye serum \u2192 COSRX as last step (replaces moisturiser) \u2192 lip balm. Sleep in it.'},
+    {dt:new Date('2025-05-29'),p:'mk',l:'Kos\xe9 8-min',ti:'AM \u2014 morning before the wedding',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm.'},
+    {dt:new Date('2025-05-30'),p:'mk',l:'Kos\xe9 8-min \u2014 wedding morning',ti:'AM \u2014 8 mins, then full routine and makeup.',adj:'Rinse \u2192 Kos\xe9 mask 8 mins \u2192 remove, pat residue in \u2192 HA on damp skin \u2192 peptide toner \u2192 niacinamide \u2192 moisturiser \u2192 SPF \u2192 lip balm \u2192 makeup.'}
+  ]}
+];
+
+function fD(d){return DS[d.getDay()]+' '+d.getDate()+' '+MO[d.getMonth()];}
+function isP(d){return d<new Date().setHours(0,0,0,0);}
+function isT(d){var n=new Date();return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();}
+
+function buildMS(){
+  var h='';
+  WKS.forEach(function(w,wi){
+    var pt='';
+    if(w.ph==='1') pt='<span class="ptag pt1">Portugal</span>';
+    if(w.ph==='2') pt='<span class="ptag pt2">no new products</span>';
+    if(w.ph==='3') pt='<span class="ptag pt3">wedding week</span>';
+    var hasT=w.days.some(function(x){return isT(x.dt);});
+    var op=wi===0||hasT;
+    h+='<div class="wblock"><div class="whead" onclick="tW(\''+w.id+'\')">';
+    h+='<div class="wtitle">'+w.t+pt+'</div>';
+    h+='<div style="display:flex;align-items:center"><span class="wmeta">'+w.d+'</span><span class="warr'+(op?' op':'')+'" id="a-'+w.id+'">&#9660;</span></div>';
+    h+='</div><div class="wbody'+(op?' op':'')+'" id="b-'+w.id+'">';
+    if(w.note) h+='<div class="wnote">'+w.note+'</div>';
+    if(w.days.length===0) h+='<div class="wnote" style="color:var(--text3)">No masks this week.</div>';
+    w.days.forEach(function(x){
+      var td=isT(x.dt),past=isP(x.dt);
+      h+='<div class="mday"><div class="mdate'+(td?' td':past?' past':'')+'">'+(td?'Today':fD(x.dt))+'</div>';
+      h+='<div class="mcnt"><div><span class="mpill '+x.p+'">'+x.l+'</span></div>';
+      h+='<div class="mnote">'+x.ti+'</div>';
+      if(x.adj) h+='<div class="madj">Routine: '+x.adj+'</div>';
+      h+='</div></div>';
+    });
+    h+='</div></div>';
+  });
+  document.getElementById('msched').innerHTML=h;
+}
+
+function tW(id){
+  var b=document.getElementById('b-'+id),a=document.getElementById('a-'+id);
+  if(b.classList.contains('op')){b.classList.remove('op');a.classList.remove('op');}
+  else{b.classList.add('op');a.classList.add('op');}
+}
+
+var LK={
+  w:{s:[
+    {l:'Base',st:[{p:'ILIA Super Serum Skin Tint (Kai ST6.5)',n:'Fingers or brush \u2014 sheer and skin-like'},{p:'ILIA Skin Blur Concealer (Gossamer 2C)',n:'Under eyes only \u2014 dot and tap with ring finger, never drag'}]},
+    {l:'Eyes',st:[{p:'Grace (soft gold pearl) all over lid',n:'Finger for most natural result'},{p:'Cocoon (warm nude matte) in crease',n:'Small brush, windshield-wiper motion'},{p:'ILIA Limitless Lash Mascara',n:'1 coat \u2014 wiggle from root to tip'}]},
+    {l:'Cheeks',st:[{p:'ILIA Sunshift Bronzer (Ray)',n:'Temples, nose bridge, outer cheeks \u2014 blend upward. Not contour.'}]},
+    {l:'Lips',st:[{p:'Amberlight + Enamel or Porcelain gloss on top',n:'Gloss sheers and cools down Amberlight for a WFH nude'}]}
+  ],tip:'Skip liner and brows today \u2014 let your skin be the focus.'},
+  s:{s:[
+    {l:'Base',st:[{p:'ILIA Super Serum Skin Tint (Kai ST6.5)',n:'Damp fingers or brush'},{p:'ILIA Skin Blur Concealer (Gossamer 2C)',n:'Under eyes + any PIH spots \u2014 tap, never drag'},{p:'Brow Pencil + Brow Gel',n:'Fill sparse areas first, set with gel \u2014 keep natural'}]},
+    {l:'Eyes',st:[{p:'Grace all over lid',n:'Flat brush or finger'},{p:'Cocoon in crease',n:'Blend in circular motion'},{p:'Lineup on outer corner + lower lashline',n:'Small angled brush \u2014 press into outer V'},{p:'Dusk gel liner on upper lashline',n:'Close to lashes \u2014 thin line only'},{p:'ILIA Limitless Lash Mascara',n:'2 coats \u2014 wiggle from root, pull through tip'}]},
+    {l:'Cheeks',st:[{p:'Flutter blush',n:'Start at outer corner of eye level \u2014 sweep up toward temple, not central'},{p:'Sunshift Bronzer (Ray)',n:'Light touch \u2014 temples and outer cheeks'}]},
+    {l:'Lips',st:[{p:'Rosette lipstick',n:'Apply directly, blot once'}]}
+  ],tip:'Blush key: start further out than you think, sweep upward. Lifts rather than widens.'},
+  d:{s:[
+    {l:'Base',st:[{p:'ILIA Super Serum Skin Tint (Kai ST6.5)',n:'Fingers for skin-like finish'},{p:'ILIA Skin Blur Concealer (Gossamer 2C)',n:'Under eyes and any spots'},{p:'Brow Pencil + Brow Gel',n:'Take your time \u2014 defined brows frame the face'}]},
+    {l:'Eyes',st:[{p:'Grace all over lid',n:'Build with flat brush'},{p:'Cocoon in crease, blended high',n:'Blend above crease for depth'},{p:'Lineup in outer V + lower lashline',n:'Deepen and define'},{p:'Unite (copper pearl) on centre lid',n:'Fingertip only \u2014 dimensional pop'},{p:'Dusk liner on upper lashline',n:'Slightly thicker than smart casual'},{p:'ILIA Limitless Lash Mascara',n:'2\u20133 coats \u2014 let each dry before next'}]},
+    {l:'Cheeks',st:[{p:'Flutter blush',n:'A touch more \u2014 outer cheeks sweeping up'},{p:'Sunshift Bronzer (Ray)',n:'Temples + light nose tip dusting'}]},
+    {l:'Lips',st:[{p:'Lady Bird multi-stick',n:'Brick-red \u2014 apply, press lips together. Pat rather than drag.'}]}
+  ],tip:'Lady Bird is rich \u2014 a light touch is enough. Pat for a romantic finish.'},
+  e:{s:[
+    {l:'Base',st:[{p:'ILIA Super Serum Skin Tint (Kai ST6.5)',n:'Brush for slightly more coverage'},{p:'ILIA Skin Blur Concealer (Gossamer 2C)',n:'Build second layer under eyes once first sets'},{p:'Brow Pencil + Brow Gel',n:'Fully defined \u2014 take your time'}]},
+    {l:'Eyes',st:[{p:'Grace all over lid',n:'Pack on with finger for maximum shimmer'},{p:'Cocoon in crease, blended high',n:'Dramatic transition'},{p:'Lineup in outer V + lower lashline + inner lower corner',n:'Press then blend for defined outer V'},{p:'Hunter (deep brick red) outer corner only',n:'Small brush \u2014 top and bottom outer corner. Blend thoroughly.'},{p:'Unite (copper pearl) centre lid',n:'Fingertip \u2014 intensify shimmer'},{p:'Dusk liner \u2014 winged at outer corner',n:'Small flick for drama'},{p:'ILIA Limitless Lash Mascara',n:'3 coats \u2014 build volume, wiggle at root'}]},
+    {l:'Cheeks',st:[{p:'Flutter blush',n:'Outer cheekbones sweeping toward temples'},{p:'Sunshift Bronzer (Ray)',n:'Temples and hairline \u2014 more definition than usual'}]},
+    {l:'Lips',st:[{p:'Marsala lipstick',n:'Deep wine-red \u2014 apply with lip brush, blot, reapply for longevity'}]}
+  ],tip:'Hunter in the outer corner is the key move. Use a tiny brush and build slowly.'}
+};
+
+function sLook(k,card){
+  document.querySelectorAll('.lcard').forEach(function(c){c.classList.remove('on');});card.classList.add('on');
+  var d=LK[k],h='<div class="card">';
+  d.s.forEach(function(sec){
+    h+='<div class="slabel">'+sec.l+'</div><ul class="steps">';
+    sec.st.forEach(function(x,i){h+=st(i+1,x.p,x.n,null);});
+    h+='</ul>';
+  });
+  if(d.tip) h+='<div class="tipbox">'+d.tip+'</div>';
+  h+='</div>';
+  document.getElementById('mkc').innerHTML=h;
 }
 
 init();
