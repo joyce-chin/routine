@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Routine">
+<title>My Daily Routine</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f5;
+    --bg3: #f0efe9;
+    --text: #1a1a1a;
+    --text2: #666660;
+    --text3: #999992;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --accent: #2c2c2a;
+    --info-bg: #e6f1fb;
+    --info-text: #0c447c;
+    --warn-bg: #faeeda;
+    --warn-text: #854f0b;
+    --success-bg: #eaf3de;
+    --success-text: #3b6d11;
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg2: #252523;
+      --bg3: #2e2e2b;
+      --text: #f0efe9;
+      --text2: #a8a89e;
+      --text3: #6e6e66;
+      --border: rgba(255,255,255,0.1);
+      --border2: rgba(255,255,255,0.18);
+      --accent: #e8e7e0;
+      --info-bg: #0c2a45;
+      --info-text: #85b7eb;
+      --warn-bg: #3a2a0a;
+      --warn-text: #fac775;
+      --success-bg: #1a2e0a;
+      --success-text: #c0dd97;
+    }
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .app { max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+
+  .header {
+    padding: 20px 16px 12px;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  .header-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .greeting { font-size: 20px; font-weight: 600; color: var(--text); }
+  .date-str { font-size: 13px; color: var(--text2); }
+
+  .tab-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border2);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--text2);
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .content { padding: 16px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .sub-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .sub-tab {
+    flex: 1;
+    padding: 7px 0;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--bg2);
+    color: var(--text2);
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .sub-tab.active {
+    background: var(--bg3);
+    color: var(--text);
+    border-color: var(--border2);
+  }
+
+  .sub-section { display: none; }
+  .sub-section.active { display: block; }
+
+  .card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .card-head {
+    padding: 12px 14px 10px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .question {
+    padding: 12px 14px;
+    background: var(--bg2);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .question-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-weight: 500; }
+
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .choice {
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border2);
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .choice.selected {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .day-btn {
+    padding: 6px 2px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--bg);
+    color: var(--text);
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .day-btn.selected { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .day-btn.today { border-color: var(--border2); font-weight: 700; }
+
+  .steps { list-style: none; }
+
+  .step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 11px 14px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 0.5px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-body { flex: 1; min-width: 0; }
+  .step-product { font-size: 14px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .step-note { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .b-active { background: var(--warn-bg); color: var(--warn-text); }
+  .b-skip { background: var(--bg3); color: var(--text3); }
+  .b-tip { background: var(--info-bg); color: var(--info-text); }
+  .b-boost { background: var(--success-bg); color: var(--success-text); }
+
+  .tip-box {
+    margin: 10px 14px 14px;
+    padding: 10px 12px;
+    background: var(--info-bg);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--info-text);
+    line-height: 1.5;
+  }
+
+  .bha-banner {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    background: var(--warn-bg);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--warn-text);
+    font-weight: 500;
+    display: none;
+  }
+
+  .sec-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 14px 4px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .look-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .look-card {
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    cursor: pointer;
+    background: var(--bg);
+    text-align: center;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .look-card.selected {
+    border-color: var(--accent);
+    background: var(--bg2);
+  }
+
+  .look-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .look-vibe { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  .makeup-steps { display: none; }
+  .makeup-steps.active { display: block; }
+
+  .divider { height: 0.5px; background: var(--border); margin: 4px 0; }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text3);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="greeting" id="greeting">Good morning</div>
+      <div class="date-str" id="date-str"></div>
+    </div>
+    <div class="tab-row">
+      <button class="tab active" onclick="showTab('skincare',this)">Skincare</button>
+      <button class="tab" onclick="showTab('makeup',this)">Makeup</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div id="skincare" class="section active">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showSub('am',this)">Morning</button>
+        <button class="sub-tab" onclick="showSub('pm',this)">Evening</button>
+      </div>
+
+      <div id="am" class="sub-section active">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Morning routine</div>
+            <div class="card-sub">Takes about 5 minutes</div>
+          </div>
+          <div class="question">
+            <div class="question-label">How does your skin feel right now?</div>
+            <div class="btn-row">
+              <button class="choice selected" onclick="setSkin('normal',this)">Normal</button>
+              <button class="choice" onclick="setSkin('tight',this)">Tight or dry</button>
+              <button class="choice" onclick="setSkin('oily',this)">Already oily</button>
+            </div>
+          </div>
+          <ul class="steps" id="am-steps"></ul>
+        </div>
+      </div>
+
+      <div id="pm" class="sub-section">
+        <div id="bha-banner" class="bha-banner">BHA night — Paula's Choice 2% BHA is in your routine tonight</div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Evening routine</div>
+            <div class="card-sub">Wind down and repair</div>
+          </div>
+          <div class="question">
+            <div class="question-label">Day of the week</div>
+            <div class="day-grid" id="day-grid"></div>
+          </div>
+          <div class="question" id="cheek-q" style="display:none">
+            <div class="question-label">Do your cheeks feel tight tonight?</div>
+            <div class="btn-row">
+              <button class="choice" onclick="setCheek('yes',this)">Yes, a bit</button>
+              <button class="choice" onclick="setCheek('no',this)">No, feel fine</button>
+            </div>
+          </div>
+          <ul class="steps" id="pm-steps"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="makeup" class="section">
+      <div class="look-grid">
+        <div class="look-card" onclick="setLook('wfh',this)">
+          <div class="look-name">WFH</div>
+          <div class="look-vibe">Minimal, skin-first</div>
+        </div>
+        <div class="look-card" onclick="setLook('smart',this)">
+          <div class="look-name">Smart casual</div>
+          <div class="look-vibe">Polished, defined</div>
+        </div>
+        <div class="look-card" onclick="setLook('date',this)">
+          <div class="look-name">Date night</div>
+          <div class="look-vibe">Romantic, warm</div>
+        </div>
+        <div class="look-card" onclick="setLook('evening',this)">
+          <div class="look-name">Evening out</div>
+          <div class="look-vibe">Bold, dramatic</div>
+        </div>
+      </div>
+      <div id="makeup-content">
+        <div class="empty-state">Select a look above to see your step-by-step guide</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var amSkin = 'normal';
+var pmDay = null;
+var pmCheek = null;
+var BHA_DAYS = ['Mon','Wed','Fri'];
+var DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function init() {
+  var now = new Date();
+  var h = now.getHours();
+  var greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting').textContent = greet;
+  var opts = {weekday:'long', day:'numeric', month:'long'};
+  document.getElementById('date-str').textContent = now.toLocaleDateString('en-GB', opts);
+  buildDayGrid(now);
+  var todayShort = DAYS[now.getDay()];
+  selectDayByName(todayShort);
+  renderAM();
+}
+
+function buildDayGrid(now) {
+  var todayShort = DAYS[now.getDay()];
+  var grid = document.getElementById('day-grid');
+  grid.innerHTML = '';
+  DAYS.forEach(function(d) {
+    var btn = document.createElement('button');
+    btn.className = 'day-btn' + (d === todayShort ? ' today' : '');
+    btn.textContent = d;
+    btn.onclick = function() { selectDayByName(d); };
+    btn.id = 'day-' + d;
+    grid.appendChild(btn);
+  });
+}
+
+function selectDayByName(d) {
+  document.querySelectorAll('.day-btn').forEach(function(b){ b.classList.remove('selected'); });
+  var btn = document.getElementById('day-' + d);
+  if (btn) btn.classList.add('selected');
+  pmDay = d;
+  pmCheek = null;
+  document.querySelectorAll('#cheek-q .choice').forEach(function(b){ b.classList.remove('selected'); });
+  document.getElementById('cheek-q').style.display = 'block';
+  var isBHA = BHA_DAYS.indexOf(d) > -1;
+  document.getElementById('bha-banner').style.display = isBHA ? 'block' : 'none';
+  renderPM();
+}
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById(tab).classList.add('active');
+}
+
+function showSub(sub, btn) {
+  document.querySelectorAll('.sub-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.sub-section').forEach(function(s){ s.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById(sub).classList.add('active');
+}
+
+function setSkin(val, btn) {
+  document.querySelectorAll('#am .question .choice').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  amSkin = val;
+  renderAM();
+}
+
+function setCheek(val, btn) {
+  document.querySelectorAll('#cheek-q .choice').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  pmCheek = val;
+  renderPM();
+}
+
+function s(num, product, note, badge) {
+  var bHtml = '';
+  if (badge) {
+    bHtml = '<span class="badge b-' + badge.c + '">' + badge.l + '</span>';
+  }
+  return '<li class="step"><div class="step-num">' + num + '</div><div class="step-body"><div class="step-product">' + product + bHtml + '</div>' + (note ? '<div class="step-note">' + note + '</div>' : '') + '</div></li>';
+}
+
+function renderAM() {
+  var tight = amSkin === 'tight';
+  var n = 1;
+  var html = '';
+  html += s(n++, 'Rinse with water', 'Skip cleanser — preserve morning skin barrier', null);
+  html += s(n++, 'BoJ Ginseng Essence Water', 'Pat gently into skin', null);
+  html += s(n++, 'TO Hyaluronic Acid 2% + B5', 'Apply while skin is still damp from step 2', {c:'tip',l:'damp skin'});
+  html += s(n++, 'COSRX 6 Peptide Collagen Toner', 'Pat in', null);
+  html += s(n++, 'TO Niacinamide 10% + Zinc 1%', 'Targets PIH and T-zone — key step', null);
+  if (tight) {
+    html += s(n++, 'Clinique Moisture Surge (extra layer)', 'Cheeks tight — add second moisturiser layer on cheeks only', {c:'boost',l:'extra moisture'});
+  }
+  html += s(n++, 'TO Natural Moisturizing Factors + Beta Glucan', 'Wait 30s after niacinamide', null);
+  html += s(n++, 'BoJ Relief Sun Aqua-fresh SPF50+', 'Last step before makeup — non-negotiable', null);
+  html += s(n++, 'ILIA Lip Wrap Reviving Balm', null, null);
+  document.getElementById('am-steps').innerHTML = html;
+}
+
+function renderPM() {
+  if (!pmDay) return;
+  var isBHA = BHA_DAYS.indexOf(pmDay) > -1;
+  var tight = pmCheek === 'yes';
+  var n = 1;
+  var html = '';
+  html += s(n++, 'Clarins Total Cleansing Oil', 'Massage in circular motions to dissolve SPF and makeup', null);
+  html += s(n++, 'BoJ Green Plum Refreshing Cleanser', 'Second cleanse — water-based', null);
+  html += s(n++, 'BoJ Ginseng Essence Water', 'Pat gently', null);
+  html += s(n++, 'TO Hyaluronic Acid 2% + B5', 'Apply while skin is still damp', {c:'tip',l:'damp skin'});
+  if (isBHA) {
+    html += s(n++, "Paula's Choice 2% BHA", 'Wait 5 mins before next step', {c:'active',l:'BHA night'});
+    html += s(n++, 'BoJ Revive Eye Serum (Ginseng + Retinal)', 'Pat around eye area only — do not rub', null);
+    if (tight) {
+      html += s(n++, 'Clinique Moisture Surge Overnight Mask', 'Tight cheeks — use instead of regular moisturiser', {c:'boost',l:'extra moisture'});
+    } else {
+      html += s(n++, 'TO Natural Moisturizing Factors + Beta Glucan', null, null);
+    }
+  } else {
+    html += s(n++, 'COSRX 6 Peptide Collagen Toner', 'Non-BHA night — peptides instead', {c:'skip',l:'no BHA'});
+    html += s(n++, 'BoJ Revive Eye Serum (Ginseng + Retinal)', 'Pat around eye area only — do not rub', null);
+    if (tight) {
+      html += s(n++, 'Clinique Moisture Surge Overnight Mask', 'Tight cheeks — use instead of regular moisturiser', {c:'boost',l:'extra moisture'});
+    } else {
+      html += s(n++, 'TO Natural Moisturizing Factors + Beta Glucan', null, null);
+    }
+  }
+  html += s(n++, 'ILIA Lip Wrap Reviving Balm', null, null);
+  document.getElementById('pm-steps').innerHTML = html;
+}
+
+var LOOKS = {
+  wfh: {
+    sections: [
+      { label: 'Base', steps: [
+        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Fingers or brush — sheer and skin-like'},
+        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Under eyes only — dot and tap with ring finger, never drag'},
+      ]},
+      { label: 'Eyes', steps: [
+        {p:'Grace (soft gold pearl) all over lid', n:'Finger application for most natural finish'},
+        {p:'Cocoon (warm nude matte) in crease', n:'Small brush, windshield-wiper motion to blend'},
+        {p:'ILIA Limitless Lash Mascara', n:'1 coat — wiggle from root to tip'},
+      ]},
+      { label: 'Cheeks', steps: [
+        {p:'ILIA Sunshift Bronzer (Ray)', n:'Temples, nose bridge, outer cheeks only — blend upward. Not contour'},
+      ]},
+      { label: 'Lips', steps: [
+        {p:'Amberlight + Enamel or Porcelain gloss on top', n:'Gloss cools down and sheers out Amberlight for a WFH nude'},
+      ]},
+    ],
+    tip: 'Skip liner and brows today — let your skin be the focus.'
+  },
+  smart: {
+    sections: [
+      { label: 'Base', steps: [
+        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Damp fingers or brush'},
+        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Under eyes + any PIH spots — tap, never drag'},
+        {p:'Brow Pencil + Brow Gel', n:'Fill sparse areas first, set with gel — keep shape natural'},
+      ]},
+      { label: 'Eyes', steps: [
+        {p:'Grace all over lid', n:'Flat brush or finger'},
+        {p:'Cocoon in crease', n:'Blend in circular motion'},
+        {p:'Lineup on outer corner + lower lashline', n:'Small angled brush — press into outer V'},
+        {p:'Dusk gel liner on upper lashline', n:'Close to lashes — thin line only'},
+        {p:'ILIA Limitless Lash Mascara', n:'2 coats — wiggle from root, pull through tip'},
+      ]},
+      { label: 'Cheeks', steps: [
+        {p:'Flutter blush', n:'Start at outer corner of eye level — sweep up toward temple, not central'},
+        {p:'Sunshift Bronzer (Ray)', n:'Light touch — temples and outer cheeks'},
+      ]},
+      { label: 'Lips', steps: [
+        {p:'Rosette lipstick', n:'Apply directly, blot once — your best everyday polished lip'},
+      ]},
+    ],
+    tip: 'Blush placement key: start further out than you think and sweep upward. Lifts rather than widens.'
+  },
+  date: {
+    sections: [
+      { label: 'Base', steps: [
+        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Fingers for a skin-like finish'},
+        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Under eyes and any spots'},
+        {p:'Brow Pencil + Brow Gel', n:'Take your time — defined brows frame the face'},
+      ]},
+      { label: 'Eyes', steps: [
+        {p:'Grace all over lid', n:'Build intensity with a flat brush'},
+        {p:'Cocoon in crease, blended high', n:'Blend well above crease for depth'},
+        {p:'Lineup in outer V + lower lashline', n:'Deepen and define'},
+        {p:'Unite (copper pearl) on centre lid', n:'Fingertip only — dimensional centre pop'},
+        {p:'Dusk liner on upper lashline', n:'Slightly thicker than smart casual'},
+        {p:'ILIA Limitless Lash Mascara', n:'2–3 coats — let each dry before the next'},
+      ]},
+      { label: 'Cheeks', steps: [
+        {p:'Flutter blush', n:'A touch more than usual — outer cheeks sweeping up'},
+        {p:'Sunshift Bronzer (Ray)', n:'Temples + light nose tip dusting'},
+      ]},
+      { label: 'Lips', steps: [
+        {p:'Lady Bird multi-stick', n:'Brick-red — apply and press lips together. Pat rather than drag for a softer finish'},
+      ]},
+    ],
+    tip: 'Lady Bird is rich — a light touch is enough. Pat for a romantic, softer finish.'
+  },
+  evening: {
+    sections: [
+      { label: 'Base', steps: [
+        {p:'ILIA Super Serum Skin Tint (Kai ST6.5)', n:'Brush for slightly more coverage'},
+        {p:'ILIA Skin Blur Concealer (Gossamer 2C)', n:'Build a second layer under eyes once first sets'},
+        {p:'Brow Pencil + Brow Gel', n:'Fully defined — take your time for evening intensity'},
+      ]},
+      { label: 'Eyes', steps: [
+        {p:'Grace all over lid', n:'Pack on with finger for maximum shimmer'},
+        {p:'Cocoon in crease, blended high', n:'Dramatic transition'},
+        {p:'Lineup in outer V + lower lashline + inner lower corner', n:'Press then blend edges for a defined outer V'},
+        {p:'Hunter (deep brick red) outer corner only', n:'Small brush — outer corner top and bottom. Blend edges thoroughly'},
+        {p:'Unite (copper pearl) centre lid', n:'Intensify the shimmer — fingertip only'},
+        {p:'Dusk liner — winged at outer corner', n:'Small flick for drama'},
+        {p:'ILIA Limitless Lash Mascara', n:'3 coats — build volume, wiggle at root'},
+      ]},
+      { label: 'Cheeks', steps: [
+        {p:'Flutter blush', n:'Outer cheekbones sweeping toward temples'},
+        {p:'Sunshift Bronzer (Ray)', n:'Temples and hairline — more definition than usual'},
+      ]},
+      { label: 'Lips', steps: [
+        {p:'Marsala lipstick', n:'Deep wine-red — apply with lip brush for precision. Blot, reapply for longevity'},
+      ]},
+    ],
+    tip: 'Hunter in the outer corner is the key move. Use a tiny brush and build slowly — easier to add than remove.'
+  }
+};
+
+function setLook(look, card) {
+  document.querySelectorAll('.look-card').forEach(function(c){ c.classList.remove('selected'); });
+  card.classList.add('selected');
+  var data = LOOKS[look];
+  var html = '<div class="card">';
+  data.sections.forEach(function(sec) {
+    html += '<div class="sec-label">' + sec.label + '</div>';
+    html += '<ul class="steps">';
+    sec.steps.forEach(function(st, i) {
+      html += s(i+1, st.p, st.n, null);
+    });
+    html += '</ul>';
+  });
+  if (data.tip) {
+    html += '<div class="tip-box">' + data.tip + '</div>';
+  }
+  html += '</div>';
+  document.getElementById('makeup-content').innerHTML = html;
+}
+
+init();
+</script>
+</body>
+</html>
